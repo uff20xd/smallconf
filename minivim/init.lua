@@ -1,41 +1,124 @@
-----------------------
--- Lazy Setup
-----------------------
+require "deps".setup()
 
--- Bootstrap lazy.nvim
-local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
-if not (vim.uv or vim.loop).fs_stat(lazypath) then
-  local lazyrepo = "https://github.com/folke/lazy.nvim.git"
-  local out = vim.fn.system({ "git", "clone", "--filter=blob:none", "--branch=stable", lazyrepo, lazypath })
-  if vim.v.shell_error ~= 0 then
-    vim.api.nvim_echo({
-      { "Failed to clone lazy.nvim:\n", "ErrorMsg" },
-      { out, "WarningMsg" },
-      { "\nPress any key to exit..." },
-    }, true, {})
-    vim.fn.getchar()
-    os.exit(1)
-  end
-end
-vim.opt.rtp:prepend(lazypath)
+-------------------------
+-- Miscellanous
+-------------------------
 
--- Make sure to setup `mapleader` and `maplocalleader` before
--- loading lazy.nvim so that mappings are correct.
--- This is also a good place to setup other settings (vim.opt)
+local o = vim.opt
+-- Basic
+o.undofile = true
+o.undolevels = 10000
+o.undodir = vim.fn.expand("~/.vim/undodir")
+
+o.syntax = "on"
+o.number = true
+o.relativenumber = true
+o.scrolloff = 11
+o.winborder = "single"
+vim.cmd("filetype plugin on")
+vim.cmd("set list")
+vim.cmd("set lcs=space.")
+
+-- Indent
+o.breakindent = true
+o.autoindent = true
+o.expandtab = true
+o.smarttab = true
+o.linebreak = true
+o.tabstop = 4
+o.shiftwidth = 4
+o.softtabstop = 4
+
+
+-- Search
+o.ignorecase = true
+o.smartcase = true
+o.incsearch = true
+o.hlsearch = false
+o.wildmode = "longest:full, full"
+o.wildmenu = true
+vim.cmd("set completeopt+=noselect")
+
+-- Miscellanous
+o.termguicolors = true
+o.cursorline = true
+o.conceallevel = 0
+o.ruler = true
+o.wrap = false
+o.signcolumn = "yes"
+o.showmode = true
+o.lazyredraw = false
+o.cmdheight = 1
+o.showmatch = true
+o.splitright = true
+vim.o.background = "dark"
+
+-- File Things
+o.swapfile = false
+o.path:append("**")
+o.modifiable = true
+o.autoread = true
+o.autowrite = false
+
+-- Optimizations
+o.updatetime = 200
+o.timeoutlen = 500
+
+-- Clipboard
+vim.cmd("set clipboard+=unnamedplus")
+
+
+-------------------------
+-- Keymaps
+-------------------------
 vim.g.mapleader = " "
-vim.g.maplocalleader = "\\"
 
--- Setup lazy.nvim
-require("lazy").setup({
-  spec = {
-    -- import your plugins
-    { import = "plugins" },
-  },
-  -- Configure any other settings here. See the documentation for more details.
-  -- colorscheme that will be used when installing plugins.
-  install = { colorscheme = { "habamax" } },
-  -- automatically check for plugin updates
-  checker = { enabled = true },
+local km = function(mode, trigger, action, config)
+  vim.keymap.set(mode, trigger, action, config)
+end
+
+km('n', '<leader>w', ':w<CR>', { noremap = true, silent = true })  -- Save file
+km('n', '<leader>q', ':q<CR>', { noremap = true, silent = true })  -- Quit Neovim
+km('n', '<leader>e', ':e .<CR>', { noremap = true, silent = true })  -- Open file explorer
+km('n', '<leader>t', ':terminal <CR>', { noremap = false, silent = true })  -- Open file explorer
+km('n', '<leader>bd', ':bdelete! <CR>', { noremap = true, silent = true})  -- Closes a buffer
+km('n', '<leader>xt', vim.treesitter.start, { noremap = true, silent = true})
+km({"i", "n"}, "<C-j>", "<", { noremap = true, silent = true })
+km({"i", "n"}, "<C-k>", ">", { noremap = true, silent = true })
+km("t", "<Esc>", "<C-\\><C-n>", { noremap = true, silent = true })
+
+-------------------------
+-- Plugins
+-------------------------
+
+local add = MiniDeps.add
+add({
+  source = "neovim/lsp-config",
+  depends = { "williamboman/mason.nvim"},
+})
+add({
+  source = "nvim-treesitter/nvim-treesitter",
+  checkout = "main",
+  hooks = { post_checkout = function() vim.cmd("TSUpdate") end },
+})
+require "nvim-treesitter.configs".setup({
+  ensure_installed = { "lua", "vimdoc" },
+  highlight = { enable = true },
 })
 
-
+add({
+  source = "nvim-mini/mini.icons"
+})
+add({
+  source = "nvim-mini/mini.completion"
+})
+add({
+  source = "nvim-mini/mini.pairs"
+})
+add({
+  source = "uff20xd/yugener",
+})
+add({
+  source = "uff20xd/postvim.nvim",
+})
+require "postvim".setup({})
