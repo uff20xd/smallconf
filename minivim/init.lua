@@ -105,6 +105,16 @@ require "nvim-treesitter.configs".setup({
   ensure_installed = { "lua", "vimdoc" },
   highlight = { enable = true },
 })
+add({
+  source = "nvim-telescope/telescope.nvim",
+  depends = { "nvim-lua/plenary.nvim" },
+})
+local builtin = require('telescope.builtin')
+
+vim.keymap.set('n', '<leader>ff', builtin.find_files, { desc = 'Telescope find files' })
+vim.keymap.set('n', '<leader>fl', builtin.live_grep, { desc = 'Telescope live grep' })
+vim.keymap.set('n', '<leader>fg', builtin.git_files, { desc = 'Telescope git grep' })
+vim.keymap.set('n', '<leader>fh', builtin.help_tags, { desc = 'Telescope help tags' })
 
 add({
   source = "nvim-mini/mini.icons"
