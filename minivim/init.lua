@@ -110,7 +110,6 @@ add({
   depends = { "nvim-lua/plenary.nvim" },
 })
 local builtin = require('telescope.builtin')
-
 vim.keymap.set('n', '<leader>ff', builtin.find_files, { desc = 'Telescope find files' })
 vim.keymap.set('n', '<leader>fl', builtin.live_grep, { desc = 'Telescope live grep' })
 vim.keymap.set('n', '<leader>fg', builtin.git_files, { desc = 'Telescope git grep' })
@@ -128,7 +127,12 @@ add({
 add({
   source = "uff20xd/yugener",
 })
+-- vim.cmd("colorscheme yugener")
 add({
   source = "uff20xd/postvim.nvim",
 })
 require "postvim".setup({})
+
+-- add({
+--   source = "stevearc/oil.nvim"
+-- })
